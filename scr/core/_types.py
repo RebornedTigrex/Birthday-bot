@@ -1,5 +1,7 @@
 from typing import Union, Tuple, Optional, Mapping
 
+# По сути этот файл вообще нахуй не нужен. Возможно я его вырежу позже, если не найду как его можно использовать.
+
 FileContent = Union[bytes, str]
 FileTypes = Union[
     FileContent,

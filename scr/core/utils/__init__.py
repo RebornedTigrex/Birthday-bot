@@ -1,1 +1,6 @@
-from . import _configExceptions, configActions
+from .configActions import configActions
+
+from ._configExceptions import(
+    configParamMiss,
+    configMiss
+)
