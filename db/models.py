@@ -1,4 +1,4 @@
-from datetime import datetime
+# from datetime import datetime
 import sqlite3
 
 from utils import configActions as config
@@ -80,7 +80,7 @@ dbSession = SqliteSession()
 
 class ModelAdmin:
     @classmethod
-    def create(cls, **kwargs) -> int:
+    def _create(cls, **kwargs) -> int:
         """
         Создает новую запись в таблице.
         :param kwargs: Поля и значения для записи
@@ -102,7 +102,7 @@ class ModelAdmin:
         Добавляет новую запись в таблицу.
         :param kwargs: Поля и значения для записи
         """
-        cls.create(**kwargs)
+        cls._create(**kwargs)
 
     def update(self, **kwargs) -> None:
         """
@@ -129,7 +129,7 @@ class ModelAdmin:
             session.commit()
 
     @classmethod
-    def get(cls, **kwargs):
+    def _get(cls, **kwargs):
         """
         Возвращает одну запись, удовлетворяющую условиям.
         :param kwargs: Поля и значения для фильтрации
@@ -178,34 +178,14 @@ class ModelAdmin:
 
 
 class User(ModelAdmin):
-    __tablename__ = "User" 
+    __tablename__ = "User"
 
     def __init__(self, id=None, telegram_id=None):
         self.id = id
-        self.telegram_id = telegram_id 
+        self.telegram_id = telegram_id
 
     @classmethod
-    def create_table(cls):
-        """
-        Создает таблицу User, если она не существует.
-        """
-        query = '''
-            CREATE TABLE IF NOT EXISTS "User" (
-                "id" INTEGER NOT NULL UNIQUE,
-                "telegram_id" TEXT NOT NULL,
-                PRIMARY KEY("id")
-            );
-
-            CREATE INDEX IF NOT EXISTS "User_index_1"
-            ON "User" ("telegram_id");
-        '''
-        with dbSession() as session:
-            cursor = session.cursor()
-            cursor.execute(query)
-            session.commit()
-
-    @classmethod
-    def create(cls, telegram_id: str) -> int:
+    def _create(cls, telegram_id: str) -> int:
         """
         Создает нового пользователя.
         :param telegram_id: ID пользователя в Telegram (тип TEXT, как в базе данных)
@@ -222,7 +202,7 @@ class User(ModelAdmin):
             return cursor.lastrowid
 
     @classmethod
-    def get(cls, **kwargs):
+    def _get(cls, **kwargs):
         """
         Получает пользователя по указанным параметрам.
         :param kwargs: Параметры для поиска (например, telegram_id="12345")
@@ -239,37 +219,6 @@ class User(ModelAdmin):
                 return cls(**dict(zip([col[0] for col in cursor.description], result)))
             return None
         
-    
-    @classmethod
-    def get_or_create(cls, telegram_id: str) -> "User":
-        """
-        Получает пользователя по telegram_id или создает нового, если он не существует.
-        :param telegram_id: ID пользователя в Telegram (тип TEXT, как в базе данных)
-        :return: Объект User
-        """
-        user = cls.get(telegram_id=telegram_id)
-        if user is None:
-            # Создаем нового пользователя 
-            user_id = cls.create(telegram_id=telegram_id)
-            user = cls.get(id=user_id)
-        return user
-
-    @classmethod
-    def filter(cls, **kwargs):
-        """
-        Возвращает всех пользователей, удовлетворяющих условиям.
-        :param kwargs: Параметры для фильтрации
-        :return: Список объектов User
-        """
-        conditions = ' AND '.join([f'{key} = ?' for key in kwargs.keys()])
-        query = f'SELECT * FROM "User" WHERE {conditions}'
-        
-        with dbSession() as session:
-            cursor = session.cursor()
-            cursor.execute(query, list(kwargs.values()))
-            results = cursor.fetchall()
-            return [cls(**dict(zip([col[0] for col in cursor.description], row))) for row in results]
-
     @classmethod
     def all(cls):
         """
@@ -283,55 +232,49 @@ class User(ModelAdmin):
             cursor.execute(query)
             results = cursor.fetchall()
             return [cls(**dict(zip([col[0] for col in cursor.description], row))) for row in results]
-
-
-class BirthdayRemind(ModelAdmin):
-    __tablename__ = "birthday_remind"
-    
-    def __init__(self, id=None, name=None, birth_date=None, message=None, remind_date=None, telegram_id=None):
-        self.id = id
-        self.name = name
-        self.birth_date = birth_date
-        self.message = message
-        self.remind_date = remind_date
-        self.telegram_id = telegram_id
-
+  
+    # Высокоуровневые методы для работы с таблицей birthday_remind
     @classmethod
-    def create_table(cls):
+    def get_birthday_reminders(cls, telegram_id):
         """
-        Создает таблицу birthday_remind, если она не существует.
+        Получает все напоминания о днях рождения для пользователя по telegram_id.
+        :param telegram_id: ID пользователя в Telegram
+        :return: Список напоминаний
         """
         query = '''
-            CREATE TABLE IF NOT EXISTS "birthday_remind" (
-                "id" INTEGER NOT NULL UNIQUE,
-                "name" TEXT NOT NULL,
-                "birth_date" DATE NOT NULL,
-                "message" TEXT,
-                "remind_date" DATE NOT NULL,
-                "telegram_id" TEXT NOT NULL UNIQUE,
-                PRIMARY KEY("id"),
-                FOREIGN KEY ("telegram_id") REFERENCES "User"("telegram_id")
-                ON UPDATE NO ACTION ON DELETE NO ACTION
-            );
-
-            CREATE INDEX IF NOT EXISTS "birthday_remind_index_0"
-            ON "birthday_remind" ("telegram_id", "name");
+            SELECT * FROM "birthday_remind"
+            WHERE telegram_id = ?
         '''
         with dbSession() as session:
             cursor = session.cursor()
-            cursor.execute(query)
+            cursor.execute(query, (telegram_id,))
+            results = cursor.fetchall()
+            return results
+
+    @classmethod
+    def delete_birthday_reminder(cls, reminder_id):
+        """
+        Удаляет конкретное напоминание по его ID.
+        :param reminder_id: ID напоминания
+        """
+        query = '''
+            DELETE FROM "birthday_remind"
+            WHERE id = ?
+        '''
+        with dbSession() as session:
+            cursor = session.cursor()
+            cursor.execute(query, (reminder_id,))
             session.commit()
 
     @classmethod
-    def create(cls, name: str, birth_date: str, message: str, remind_date: str, telegram_id: str) -> int:
+    def add_birthday_reminder(cls, telegram_id, name, birth_date, message, remind_date):
         """
-        Создает новую запись в таблице birthday_remind.
-        :param name: Имя
-        :param birth_date: Дата рождения (в формате YYYY-MM-DD)
-        :param message: Сообщение
-        :param remind_date: Дата напоминания (в формате YYYY-MM-DD)
+        Добавляет новое напоминание о дне рождения для пользователя.
         :param telegram_id: ID пользователя в Telegram
-        :return: ID созданной записи
+        :param name: Имя человека
+        :param birth_date: Дата рождения (в формате DATE)
+        :param message: Сообщение для напоминания
+        :param remind_date: Дата напоминания (в формате DATE)
         """
         query = '''
             INSERT INTO "birthday_remind" (name, birth_date, message, remind_date, telegram_id)
@@ -341,25 +284,6 @@ class BirthdayRemind(ModelAdmin):
             cursor = session.cursor()
             cursor.execute(query, (name, birth_date, message, remind_date, telegram_id))
             session.commit()
-            return cursor.lastrowid
-
-    @classmethod
-    def get(cls, **kwargs):
-        """
-        Получает запись по указанным параметрам.
-        :param kwargs: Параметры для поиска (например, telegram_id="12345")
-        :return: Объект BirthdayRemind или None
-        """
-        conditions = ' AND '.join([f'{key} = ?' for key in kwargs.keys()])
-        query = f'SELECT * FROM "birthday_remind" WHERE {conditions}'
-        
-        with dbSession() as session:
-            cursor = session.cursor()
-            cursor.execute(query, list(kwargs.values()))
-            result = cursor.fetchone()
-            if result:
-                return cls(**dict(zip([col[0] for col in cursor.description], result)))
-            return None
         
 
 # class User(Base, ModelAdmin):

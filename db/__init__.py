@@ -1,1 +1,1 @@
-from db.models import User, BirthdayRemind
+from db.models import User

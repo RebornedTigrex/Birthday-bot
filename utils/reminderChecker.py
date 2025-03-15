@@ -1,6 +1,8 @@
 import sqlite3, asyncio
 from datetime import date
 
+# TODO: Переписать под новый db.models
+
 async def check_reminders():
     while True:
         today = date.today()

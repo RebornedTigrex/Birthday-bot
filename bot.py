@@ -21,6 +21,7 @@ async def bot_stopped():
 async def main():
     tasks = [
         dp.start_polling(bot)
+        #TODO: Метод проверки дат и отправки сообщений
     ]
     dp.shutdown.register(bot_stopped)
     await asyncio.gather(*tasks)

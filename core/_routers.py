@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from core import UserData
 from bot import dp, db, User
 
-from db import User, BirthdayRemind
+from db import User, Birthday
 
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):

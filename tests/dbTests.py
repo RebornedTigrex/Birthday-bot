@@ -1,9 +1,9 @@
-from db import User, BirthdayRemind
+from db import User
 
 class BaseTest:
     pass
 
-class UserTest(BaseTest):
+class UserTest(BaseTest): # TODO: Дописать
     User.get_or_create("0")
-    User.get(kwargs="0")
+    User._get()
     

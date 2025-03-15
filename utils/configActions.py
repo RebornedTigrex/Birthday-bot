@@ -40,7 +40,7 @@ class configActions:
         self._loadCfg()
         return self.config_data
     
-    def takeParam(self, param:str) -> str:
+    def takeParam(self, param:str) -> str|list[str]:
         self._loadCfg()
         return self.config_data[param]
         

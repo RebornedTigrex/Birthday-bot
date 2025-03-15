@@ -1,11 +1,17 @@
-import logging
-import requests
-from storage.config import admins, bot_token
+import logging, requests
+
+from utils import configActions as config
 
 logging.basicConfig(level=logging.INFO, format="SCRIPT | %(levelname)s | %(message)s")
 logger = logging.getLogger(__name__)
 
+
+
 def log(department, level, msg, user_id="SYSTEM"):
+    
+    bot_token = config.takeParam("TOKEN")
+    admins = config.takeParam("ADMINS")
+    
     levels = {
         "debug": logging.DEBUG,
         "info": logging.INFO,
