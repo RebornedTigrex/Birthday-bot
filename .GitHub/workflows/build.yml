@@ -1,17 +1,17 @@
-name: Print workflow #Название workflow
-on: workflow_dispatch #Триггер, который будет вызывать workflow
+# name: Print workflow #Название workflow
+# on: workflow_dispatch #Триггер, который будет вызывать workflow
 
-jobs: #Начало секции джобов
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.10]
+# jobs: #Начало секции джобов
+#     runs-on: ubuntu-latest
+#     strategy:
+#       matrix:
+#         python-version: [3.10]
     
-    steps:
-    - name: Set up Python ${{ matrix.python-version }}
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pipenv
-        pipenv install --dev
+#     steps:
+#     - name: Set up Python ${{ matrix.python-version }}
+#       with:
+#         python-version: ${{ matrix.python-version }}
+#     - name: Install dependencies
+#       run: |
+#         python -m pip install --upgrade pipenv
+#         pipenv install --dev
