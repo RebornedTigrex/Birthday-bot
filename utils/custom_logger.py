@@ -1,16 +1,18 @@
 import logging, requests
 
-from utils import configActions as config
+from . import config
 
 logging.basicConfig(level=logging.INFO, format="SCRIPT | %(levelname)s | %(message)s")
 logger = logging.getLogger(__name__)
 
 
 
+
+
 def log(department, level, msg, user_id="SYSTEM"):
     
-    bot_token = config.takeParam("TOKEN")
-    admins = config.takeParam("ADMINS")
+    bot_token = config["TOKEN"]
+    admins = config["ADMINS"]
     
     levels = {
         "debug": logging.DEBUG,

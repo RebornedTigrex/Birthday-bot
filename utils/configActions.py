@@ -16,12 +16,14 @@ class configActions:
         
         self.config_data = self.config_base
         
+    @classmethod
     def _checkCfg(self):
         if Path.exists(self.config_path):
             return True
         else:
             raise Exception("Cfg miss")
 
+    @classmethod
     def _loadCfg(self):
         self._checkCfg()
         try:
@@ -35,11 +37,13 @@ class configActions:
             
         except Exception as err:
             print(err)
-    
+   
+    @classmethod
     def takeCfg(self) -> dict:
         self._loadCfg()
         return self.config_data
     
+    @classmethod
     def takeParam(self, param:str) -> str|list[str]:
         self._loadCfg()
         return self.config_data[param]

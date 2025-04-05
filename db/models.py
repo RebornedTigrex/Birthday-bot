@@ -1,7 +1,7 @@
 # from datetime import datetime
 import sqlite3
 
-from utils import configActions as config
+from utils import config
 
 # class Base(DeclarativeBase):
 #     pass
@@ -15,7 +15,7 @@ PS - Tigrex'''
 
 
 class SqliteSession:
-    def __init__(self, dbLocation = config.takeCfg("dbLocation") ):
+    def __init__(self, dbLocation = config["dbLocation"]):
         execute_script = '''
             CREATE TABLE IF NOT EXISTS "User" (
                 "id" INTEGER NOT NULL UNIQUE,
@@ -97,14 +97,14 @@ class ModelAdmin:
             return cursor.lastrowid
 
     @classmethod
-    def add(cls, **kwargs) -> None:
+    def _add(cls, **kwargs) -> None:
         """
         Добавляет новую запись в таблицу.
         :param kwargs: Поля и значения для записи
         """
         cls._create(**kwargs)
 
-    def update(self, **kwargs) -> None:
+    def _update(self, **kwargs) -> None:
         """
         Обновляет текущую запись.
         :param kwargs: Поля и значения, которые нужно обновить
@@ -117,7 +117,7 @@ class ModelAdmin:
             cursor.execute(query, list(kwargs.values()) + [self.id])
             session.commit()
 
-    def delete(self) -> None:
+    def _delete(self) -> None:
         """
         Удаляет текущую запись.
         """
@@ -129,7 +129,7 @@ class ModelAdmin:
             session.commit()
 
     @classmethod
-    def _get(cls, **kwargs):
+    def get(cls, **kwargs):
         """
         Возвращает одну запись, удовлетворяющую условиям.
         :param kwargs: Поля и значения для фильтрации

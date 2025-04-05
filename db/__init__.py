@@ -1,1 +1,1 @@
-from db.models import User
+from db.models import User, ModelAdmin
