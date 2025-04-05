@@ -30,5 +30,3 @@ class _config(jsonFile):
         if env_config:
             path = env_config
         super().__init__(path, file)
-
-config = _config()

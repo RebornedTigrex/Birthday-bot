@@ -80,7 +80,7 @@ dbSession = SqliteSession()
 
 class ModelAdmin:
     @classmethod
-    def _create(cls, **kwargs) -> int:
+    def create(cls, **kwargs) -> int:
         """
         Создает новую запись в таблице.
         :param kwargs: Поля и значения для записи
@@ -95,14 +95,6 @@ class ModelAdmin:
             cursor.execute(query, list(kwargs.values()))
             session.commit()
             return cursor.lastrowid
-
-    @classmethod
-    def _add(cls, **kwargs) -> None:
-        """
-        Добавляет новую запись в таблицу.
-        :param kwargs: Поля и значения для записи
-        """
-        cls._create(**kwargs)
 
     def _update(self, **kwargs) -> None:
         """

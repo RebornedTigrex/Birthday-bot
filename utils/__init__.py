@@ -1,2 +1,5 @@
-from .fileAction import File, jsonFile, config
-from .custom_logger import log
+from .fileAction import File, jsonFile
+
+from .fileAction import _config
+
+config = _config()
