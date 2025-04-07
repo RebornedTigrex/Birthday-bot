@@ -1,12 +1,10 @@
+from utils.bot_instance import dp  # Импортируем dp из bot_instance
 from aiogram import types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 
 from core import UserData
-from bot import dp, SessionLocal
-from db.models import User, BirthdayRemind
-
-from sqlalchemy.exc import NoResultFound
+from db.models import SessionLocal, BirthdayRemind
 from datetime import datetime
 
 

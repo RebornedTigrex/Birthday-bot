@@ -4,7 +4,7 @@ from aiogram.fsm.state import State, StatesGroup
 # Настройка логгера
 logger = logging.getLogger(__name__)
 
-async def try_finish(state):
+async def tryFinish(state):
     """
     Попытка завершить текущее состояние FSM.
     :param state: FSMContext

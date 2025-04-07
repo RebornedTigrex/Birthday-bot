@@ -72,7 +72,7 @@ load_dotenv()
 # Настройка подключения к базе данных
 DATABASE_URL = os.getenv("DATABASE_URL", "default_path_to_db.db")
 engine = create_engine(f"sqlite:///{DATABASE_URL}", echo=True)
-session_local = sessionmaker(bind=engine)
+SessionLocal = sessionmaker(bind=engine)
 
 # Инициализация базы данных
 def init_db():
@@ -84,7 +84,7 @@ def init_db():
 if __name__ == "__main__":
     init_db()
     try:
-        session = session_local()
+        session = SessionLocal()
 
         # Пример добавления пользователя
         user = User.get_or_create(session, telegram_id="123456")

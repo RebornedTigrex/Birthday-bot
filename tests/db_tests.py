@@ -31,7 +31,7 @@ def test_user_creation(db_session):
     assert user.id is not None
 
     # Проверяем, что пользователь существует в базе
-    fetched_user = db_session.query(User).filter_by(telegram_id=test_telegram_id).first()
+    fetched_user = db_session.query(User).filter_by(telegram_id=test_telegram_id).first()  # Используем класс User
     assert fetched_user is not None
     assert fetched_user.id == user.id
 
@@ -92,7 +92,7 @@ def test_cleanup(db_session):
 
     # Удаляем данные
     db_session.query(BirthdayRemind).filter_by(telegram_id=test_telegram_id).delete()
-    db_session.query(User).filter_by(telegram_id=test_telegram_id).delete()
+    db_session.query(User).filter_by(telegram_id=test_telegram_id).delete()  # Используем класс User
     db_session.commit()
 
     # Проверяем, что данные удалены

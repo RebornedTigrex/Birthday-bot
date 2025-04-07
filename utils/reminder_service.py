@@ -2,7 +2,6 @@ import asyncio
 import logging
 from datetime import datetime, timedelta, date
 from db.models import SessionLocal, BirthdayRemind
-from bot import bot  # Предполагается, что объект бота импортирован
 
 # Настройка логгера
 logger = logging.getLogger(__name__)
@@ -67,10 +66,12 @@ class DataCheck:
 
 
 class ReminderChecker:
-    def __init__(self, check_interval=600):
+    def __init__(self, bot, check_interval=600):
         """
+        :param bot: Экземпляр бота.
         :param check_interval: Интервал проверки в секундах (по умолчанию 600 секунд).
         """
+        self.bot = bot  # Сохраняем объект бота
         self.session = SessionLocal()
         self.check_interval = check_interval
         logger.info("ReminderChecker инициализирован с параметром: check_interval=%s", self.check_interval)
@@ -91,7 +92,7 @@ class ReminderChecker:
 
                     # Отправляем сообщение пользователю
                     logger.info("Отправка напоминания пользователю telegram_id=%s: %s", telegram_id, message)
-                    await bot.send_message(telegram_id, f"Напоминание: {message}")
+                    await self.bot.send_message(telegram_id, f"Напоминание: {message}")
 
                     # Удаляем напоминание или обновляем remind_date (например, на следующий год)
                     self.session.delete(reminder)
