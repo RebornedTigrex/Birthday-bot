@@ -59,7 +59,7 @@ Birthday-bot/
 
 ### 1. Клонирование репозитория
 ```bash
-git clone https://github.com/your-username/Birthday-bot.git
+git clone https://github.com/RebornedTigrex/Birthday-bot.git
 cd Birthday-bot
 ```
 
