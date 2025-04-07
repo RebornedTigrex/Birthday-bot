@@ -74,11 +74,12 @@ class ReminderChecker:
         self.bot = bot  # Сохраняем объект бота
         self.session = SessionLocal()
         self.check_interval = check_interval
+        self.stop_event = asyncio.Event()  # Флаг для остановки цикла
         logger.info("ReminderChecker инициализирован с параметром: check_interval=%s", self.check_interval)
 
     async def check_reminders(self):
         """Метод проверки напоминаний и отправки сообщений"""
-        while True:
+        while not self.stop_event.is_set():  # Проверяем, установлен ли флаг остановки
             try:
                 today = date.today()
                 logger.info("Проверка напоминаний на дату: %s", today)
@@ -106,6 +107,10 @@ class ReminderChecker:
                 # Интервал проверки
                 logger.info("Ожидание %d секунд до следующей проверки", self.check_interval)
                 await asyncio.sleep(self.check_interval)
+
+    async def stop(self):
+        """Останавливает цикл проверки напоминаний"""
+        self.stop_event.set()
 
     async def start(self):
         """Запуск проверки напоминаний"""

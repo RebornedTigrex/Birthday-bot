@@ -6,6 +6,7 @@ from aiogram.fsm.context import FSMContext
 from core import UserData
 from db.models import SessionLocal, BirthdayRemind
 from datetime import datetime
+from aiogram.types import ReplyKeyboardRemove
 
 
 @dp.message(Command("start"))
@@ -100,4 +101,4 @@ async def cmd_my_birthday(message: types.Message):
 @dp.message(Command("cancel"))
 async def cmd_cancel(message: types.Message, state: FSMContext):
     await state.clear()
-    await message.answer("Действие отменено.")
+    await message.answer("Действие отменено.", reply_markup=ReplyKeyboardRemove())
