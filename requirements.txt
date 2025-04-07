@@ -1,3 +1,5 @@
 aiogram==3.18.0
 redis==5.2.1
-requests==2.32.3
+aiohttp==3.11.13
+SQLAlchemy==2.0.40
+pytest==8.3.5

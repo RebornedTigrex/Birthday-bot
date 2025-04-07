@@ -1,8 +1,12 @@
 /.venv
 .vscode
 
-*/config.json
-*/birthdays.db
+*/configData/config.json
 
-*/__pycache__
+*/__pycache__/*
+*.pyc
+
+./pytest_cache/*
+
+configData/.env
 

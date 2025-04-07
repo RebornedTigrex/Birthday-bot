@@ -1,18 +1,25 @@
+import logging
 from aiogram.fsm.state import State, StatesGroup
 
-async def tryFinish(state):
+# Настройка логгера
+logger = logging.getLogger(__name__)
+
+async def try_finish(state):
+    """
+    Попытка завершить текущее состояние FSM.
+    :param state: FSMContext
+    """
     try:
         await state.clear()
-    except:
-        pass
+        logger.info("Состояние FSM успешно завершено.")
+    except Exception as e:
+        logger.error(f"Ошибка при завершении состояния FSM: {e}")
 
 class UserData(StatesGroup):
-    name = State() 
-    date = State()
-    message_remind = State()
-
-# class State(StatesGroup):
-#     State = State()
-
-# class ContactWithDevs(StatesGroup):
-#     Message = State()
+    """
+    Состояния для работы с данными пользователя.
+    """
+    name = State()  # Ввод имени
+    date = State()  # Ввод даты рождения
+    message_remind = State()  # Ввод сообщения для напоминания
+    logger.info("Состояния FSM для UserData инициализированы.")
