@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  bot:
+    build:
+      context: .
+    env_file:
+      - .env  # Подключаем файл с переменными окружения
+    volumes:
+      - ./data:/app/data  # Монтируем локальную папку ./data в контейнер
+    working_dir: /app
+    command: python bot.py  # Команда для запуска бота
+    depends_on:
+      - redis
+    networks:
+      - bot-network
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - bot-network
+
+volumes:
+  bot-data:  # Определяем том для хранения данных
+    driver: local
+
+networks:
+  bot-network:
+    driver: bridge

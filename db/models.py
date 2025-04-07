@@ -1,7 +1,7 @@
 import logging
 from sqlalchemy import create_engine, Column, Integer, String, Date, ForeignKey, Text, Index
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 import os
 
 # Настройка логгера
@@ -66,8 +66,10 @@ class BirthdayRemind(Base):
 Index("user_index_1", User.telegram_id)
 Index("birthday_remind_index_0", BirthdayRemind.telegram_id, BirthdayRemind.name)
 
-# Загрузка переменных из .env
-load_dotenv()
+# Загрузка переменных из .env только если они не заданы
+if not os.getenv("TOKEN"):
+    from dotenv import load_dotenv, find_dotenv
+    load_dotenv(find_dotenv())
 
 # Настройка подключения к базе данных
 DATABASE_URL = os.getenv("DATABASE_URL", "default_path_to_db.db")

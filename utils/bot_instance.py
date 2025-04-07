@@ -4,7 +4,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.fsm.storage.redis import RedisStorage
 from redis.asyncio import Redis
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 
 # Настройка логгера
 logging.basicConfig(
@@ -13,8 +13,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Загрузка переменных из .env
-load_dotenv()
+# Загрузка переменных из .env только если они не заданы
+if not os.getenv("TOKEN"):
+    from dotenv import load_dotenv, find_dotenv
+    load_dotenv(find_dotenv())
 
 # Получение параметров из переменных окружения
 TOKEN = os.getenv("TOKEN")
