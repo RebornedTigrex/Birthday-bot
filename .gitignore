@@ -1,12 +1,10 @@
 /.venv
 .vscode
 
-*/configData/config.json
-
+__pycache__
 */__pycache__/*
 *.pyc
 
-./pytest_cache/*
+.pytest_cache
 
-configData/.env
-
+.env
