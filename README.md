@@ -68,7 +68,7 @@ cd Birthday-bot
 ```env
 TOKEN=ваш_токен_бота
 REDIS_HOST=localhost:6379
-DATABASE_URL=sqlite:///userData/birthdays.db
+DATABASE_URL=userData/birthdays.db
 
 DB_LOCATION=userData/birthdays.db
 ADMINS=TELEGRAM_IDs

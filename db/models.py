@@ -65,6 +65,9 @@ class BirthdayRemind(Base):
 Index("user_index_1", User.telegram_id)
 Index("birthday_remind_index_0", BirthdayRemind.telegram_id, BirthdayRemind.name)
 
+# Определение абсолютного пути к корневой папке
+ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
+
 # Загрузка переменных из .env только если они не заданы
 if not os.getenv("DATABASE_URL"):
     from dotenv import load_dotenv, find_dotenv
@@ -72,14 +75,22 @@ if not os.getenv("DATABASE_URL"):
 
 # Настройка подключения к базе данных
 DATABASE_URL = os.getenv("DATABASE_URL", "default_path_to_db.db")
-engine = create_engine(f"sqlite:///{DATABASE_URL}", echo=True)
+dbUrl = os.path.join(ROOT_DIR, DATABASE_URL)
+engine = create_engine(f"sqlite:///{dbUrl}", echo=True)
 SessionLocal = sessionmaker(bind=engine)
 
 # Инициализация базы данных
 def init_db():
     logger.info("Инициализация базы данных...")
-    Base.metadata.create_all(bind=engine)
-    logger.info("База данных успешно инициализирована.")
+    try:
+        if not engine.dialect.has_table(engine, "user") or not engine.dialect.has_table(engine, "birthday_remind"):
+            Base.metadata.create_all(bind=engine)
+            logger.info("Таблицы успешно созданы.")
+        else:
+            logger.info("Таблицы уже существуют. Пропуск создания.")
+    except Exception as e:
+        logger.error(f"Ошибка при инициализации базы данных: {e}")
+    logger.info("Инициализация базы данных завершена.")
 
 # Пример использования
 if __name__ == "__main__":

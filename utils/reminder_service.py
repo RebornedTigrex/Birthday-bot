@@ -1,10 +1,12 @@
 import asyncio
 import logging
 from datetime import datetime, timedelta, date
-from db.models import SessionLocal, BirthdayRemind
+from db.models import SessionLocal, BirthdayRemind, init_db
 
 # Настройка логгера
 logger = logging.getLogger(__name__)
+
+init_db()
 
 class DataCheck:
     def __init__(self, check_dates=None, check_interval=600):

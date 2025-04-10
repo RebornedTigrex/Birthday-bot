@@ -1,8 +1,10 @@
 import asyncio
 import logging
+from aiogram.types import BotCommand
+
 from utils.bot_instance import bot, dp
 from utils.reminder_service import ReminderChecker  # Импортируем ReminderChecker для проверки напоминаний
-from aiogram.types import BotCommand
+
 
 # Настройка логгера
 logger = logging.getLogger(__name__)
@@ -14,30 +16,36 @@ async def bot_stopped():
 async def set_bot_commands():
     """Устанавливаем команды для меню бота"""
     commands = [
-        BotCommand(command="/start", description="Добавить новое напоминание"),
+        BotCommand(command="/start", description="Приветственное сообщение"),
+        BotCommand(command="/add_birthday", description="Добавить новое напоминание"),
         BotCommand(command="/my_birthday", description="Просмотреть все напоминания"),
+        BotCommand(command="/delete_birthday", description="Удалить напоминание"),
         BotCommand(command="/cancel", description="Отменить текущее действие"),
     ]
     await bot.set_my_commands(commands)
 
 # Основная функция запуска бота
 async def main():
-    # Устанавливаем команды
-    await set_bot_commands()
+    try:
+        # Устанавливаем команды
+        await set_bot_commands()
 
-    # Создаем объект для проверки напоминаний
-    reminder_checker = ReminderChecker(bot=bot, check_interval=600)  # Передаем объект бота
+        # Создаем объект для проверки напоминаний
+        reminder_checker = ReminderChecker(bot=bot, check_interval=600)  # Передаем объект бота
 
-    # Регистрируем обработчик остановки бота
-    dp.shutdown.register(bot_stopped)
+        # Регистрируем обработчик остановки бота
+        dp.shutdown.register(bot_stopped)
 
-    logger.info("Bot is starting...")
+        logger.info("Bot is starting...")
 
-    # Запускаем задачи
-    await asyncio.gather(
-        dp.start_polling(bot),  # Запуск бота
-        reminder_checker.start()  # Запуск проверки напоминаний
-    )
+        # Запускаем задачи
+        await asyncio.gather(
+            dp.start_polling(bot),  # Запуск бота
+            reminder_checker.start()  # Запуск проверки напоминаний
+        )
+    except Exception as e:
+        logger.error(f"Ошибка при запуске бота: {e}")
+        raise
 
 # Запуск бота
 if __name__ == "__main__":

@@ -22,4 +22,5 @@ class UserData(StatesGroup):
     name = State()  # Ввод имени
     date = State()  # Ввод даты рождения
     message_remind = State()  # Ввод сообщения для напоминания
+    delete_name = State()  # Удаление напоминания
     logger.info("Состояния FSM для UserData инициализированы.")

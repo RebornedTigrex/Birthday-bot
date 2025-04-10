@@ -2,15 +2,27 @@ from utils.bot_instance import dp  # Импортируем dp из bot_instance
 from aiogram import types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
+from datetime import datetime
+from aiogram.types import ReplyKeyboardRemove, BotCommand
 
 from core import UserData
 from db.models import SessionLocal, BirthdayRemind
-from datetime import datetime
-from aiogram.types import ReplyKeyboardRemove
+
 
 
 @dp.message(Command("start"))
-async def cmd_start(message: types.Message, state: FSMContext):
+async def cmd_start(message: types.Message):
+    await message.answer(
+        "Добро пожаловать в Birthday Bot! Вы можете использовать следующие команды:\n"
+        "/add_birthday - Добавить новое напоминание о дне рождения\n"
+        "/my_birthday - Просмотреть все напоминания\n"
+        "/delete_birthday - Удалить напоминание о дне рождения\n"
+        "/cancel - Отменить текущее действие"
+    )
+
+
+@dp.message(Command("add_birthday"))
+async def cmd_add_birthday(message: types.Message, state: FSMContext):
     await state.set_state(UserData.name)
     await message.answer("Пожалуйста, введите имя человека, которого вы хотите поздравить:")
 
@@ -96,6 +108,52 @@ async def cmd_my_birthday(message: types.Message):
         print(e)
     finally:
         session.close()
+
+
+@dp.message(Command("delete_birthday"))
+async def cmd_delete_birthday(message: types.Message, state: FSMContext):
+    session = SessionLocal()
+    try:
+        user_reminders = session.query(BirthdayRemind).filter_by(telegram_id=message.from_user.id).all()
+        if user_reminders:
+            response = "Выберите напоминание для удаления, отправив его ID:\n\n"
+            for reminder in user_reminders:
+                response += (
+                    f"ID: {reminder.id}\n"
+                    f"Имя: {reminder.name}\n"
+                    f"Дата рождения: {reminder.birth_date}\n\n"
+                )
+            await state.set_state(UserData.delete_id)
+            await message.answer(response)
+        else:
+            await message.answer("У вас пока нет сохранённых напоминаний.")
+    except Exception as e:
+        await message.answer("Произошла ошибка при получении данных.")
+        print(e)
+    finally:
+        session.close()
+
+
+@dp.message(UserData.delete_id)
+async def process_delete_birthday_by_id(message: types.Message, state: FSMContext):
+    session = SessionLocal()
+    try:
+        reminder_id = message.text
+        reminder = session.query(BirthdayRemind).filter_by(
+            telegram_id=message.from_user.id, id=reminder_id
+        ).first()
+        if reminder:
+            session.delete(reminder)
+            session.commit()
+            await message.answer(f"Напоминание с ID {reminder_id} успешно удалено.")
+        else:
+            await message.answer(f"Напоминание с ID {reminder_id} не найдено.")
+    except Exception as e:
+        await message.answer("Произошла ошибка при удалении напоминания.")
+        print(e)
+    finally:
+        session.close()
+        await state.clear()
 
 
 @dp.message(Command("cancel"))
