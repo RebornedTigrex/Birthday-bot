@@ -1,5 +1,5 @@
 import logging
-from sqlalchemy import create_engine, Column, Integer, String, Date, ForeignKey, Text, Index
+from sqlalchemy import create_engine, Column, Integer, String, Date, ForeignKey, Text, Index, inspect
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 import os
 
@@ -74,7 +74,7 @@ if not os.getenv("DATABASE_URL"):
     load_dotenv(find_dotenv())
 
 # Настройка подключения к базе данных
-DATABASE_URL = os.getenv("DATABASE_URL", "default_path_to_db.db")
+DATABASE_URL = os.getenv("DATABASE_URL", "birtdays.db")
 dbUrl = os.path.join(ROOT_DIR, DATABASE_URL)
 engine = create_engine(f"sqlite:///{dbUrl}", echo=True)
 SessionLocal = sessionmaker(bind=engine)
@@ -83,7 +83,8 @@ SessionLocal = sessionmaker(bind=engine)
 def init_db():
     logger.info("Инициализация базы данных...")
     try:
-        if not engine.dialect.has_table(engine, "user") or not engine.dialect.has_table(engine, "birthday_remind"):
+        inspector = inspect(engine)  # Создаем инспектор для проверки таблиц
+        if not inspector.has_table("user") or not inspector.has_table("birthday_remind"):
             Base.metadata.create_all(bind=engine)
             logger.info("Таблицы успешно созданы.")
         else:

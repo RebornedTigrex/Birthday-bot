@@ -2,8 +2,10 @@ import os
 import logging
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
-from aiogram.fsm.storage.redis import RedisStorage
-from redis.asyncio import Redis
+
+from aiogram.fsm.storage.memory import MemoryStorage
+# from aiogram.fsm.storage.redis import RedisStorage
+# from redis.asyncio import Redis
 from dotenv import load_dotenv, find_dotenv
 
 # Настройка логгера
@@ -28,10 +30,11 @@ if not TOKEN:
     raise ValueError("Переменная окружения TOKEN не задана")
 
 # Настройка Redis для хранения состояний
-redis_host, redis_port = REDIS_HOST.split(":")
-redis = Redis(host=redis_host, port=int(redis_port), db=0)
-storage = RedisStorage(redis)
+# redis_host, redis_port = REDIS_HOST.split(":")
+# redis = Redis(host=redis_host, port=int(redis_port), db=0)
+# storage = RedisStorage(redis)
+storage = MemoryStorage()
 
-# Создание объекта бота и диспетчера
+# Создание объекта бота и диспетчера с использованием MemoryStorage
 bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode='html'))
 dp = Dispatcher(storage=storage)
