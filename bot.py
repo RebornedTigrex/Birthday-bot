@@ -4,6 +4,7 @@ from aiogram.types import BotCommand
 
 from utils.bot_instance import bot, dp
 from utils.reminder_service import ReminderChecker  # Импортируем ReminderChecker для проверки напоминаний
+from handlers.routers import router  # Импортируем роутеры
 
 
 # Настройка логгера
@@ -29,6 +30,9 @@ async def main():
     try:
         # Устанавливаем команды
         await set_bot_commands()
+
+        # Регистрируем роутеры
+        dp.include_router(router)
 
         # Создаем объект для проверки напоминаний
         reminder_checker = ReminderChecker(bot=bot, check_interval=600)  # Передаем объект бота

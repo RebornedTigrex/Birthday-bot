@@ -1,16 +1,18 @@
-from utils.bot_instance import dp  # Импортируем dp из bot_instance
 from aiogram import types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from datetime import datetime
-from aiogram.types import ReplyKeyboardRemove, BotCommand
+from aiogram.types import ReplyKeyboardRemove
+from aiogram import Router
 
 from core import UserData
 from db.models import SessionLocal, BirthdayRemind
 
+# Создаем объект Router для регистрации маршрутов
+router = Router()
 
-
-@dp.message(Command("start"))
+# Регистрация всех обработчиков в router вместо dp
+@router.message(Command("start"))
 async def cmd_start(message: types.Message):
     await message.answer(
         "Добро пожаловать в Birthday Bot! Вы можете использовать следующие команды:\n"
@@ -20,21 +22,18 @@ async def cmd_start(message: types.Message):
         "/cancel - Отменить текущее действие"
     )
 
-
-@dp.message(Command("add_birthday"))
+@router.message(Command("add_birthday"))
 async def cmd_add_birthday(message: types.Message, state: FSMContext):
     await state.set_state(UserData.name)
     await message.answer("Пожалуйста, введите имя человека, которого вы хотите поздравить:")
 
-
-@dp.message(UserData.name)
+@router.message(UserData.name)
 async def process_name(message: types.Message, state: FSMContext):
     await state.update_data(name=message.text)
     await state.set_state(UserData.date)
     await message.answer("Теперь введите дату его рождения в формате YYYY-MM-DD:")
 
-
-@dp.message(UserData.date)
+@router.message(UserData.date)
 async def process_birthday(message: types.Message, state: FSMContext):
     birthday = message.text
 
@@ -54,8 +53,7 @@ async def process_birthday(message: types.Message, state: FSMContext):
         "Теперь введите сообщение, которое вы хотите отправить в день напоминания:"
     )
 
-
-@dp.message(UserData.message_remind)
+@router.message(UserData.message_remind)
 async def process_message_remind(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
     name = user_data.get("name")
@@ -85,8 +83,7 @@ async def process_message_remind(message: types.Message, state: FSMContext):
 
     await state.clear()
 
-
-@dp.message(Command("my_birthday"))
+@router.message(Command("my_birthday"))
 async def cmd_my_birthday(message: types.Message):
     session = SessionLocal()
     try:
@@ -109,8 +106,7 @@ async def cmd_my_birthday(message: types.Message):
     finally:
         session.close()
 
-
-@dp.message(Command("delete_birthday"))
+@router.message(Command("delete_birthday"))
 async def cmd_delete_birthday(message: types.Message, state: FSMContext):
     session = SessionLocal()
     try:
@@ -133,8 +129,7 @@ async def cmd_delete_birthday(message: types.Message, state: FSMContext):
     finally:
         session.close()
 
-
-@dp.message(UserData.delete_id)
+@router.message(UserData.delete_id)
 async def process_delete_birthday_by_id(message: types.Message, state: FSMContext):
     session = SessionLocal()
     try:
@@ -155,8 +150,7 @@ async def process_delete_birthday_by_id(message: types.Message, state: FSMContex
         session.close()
         await state.clear()
 
-
-@dp.message(Command("cancel"))
+@router.message(Command("cancel"))
 async def cmd_cancel(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer("Действие отменено.", reply_markup=ReplyKeyboardRemove())
